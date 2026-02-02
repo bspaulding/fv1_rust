@@ -1,4 +1,4 @@
-/// FV-1 Hardware Constants
+//! FV-1 Hardware Constants
 
 /// Maximum number of instructions in a program
 pub const MAX_INSTRUCTIONS: usize = 128;

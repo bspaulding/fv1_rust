@@ -6,20 +6,20 @@ use crate::constants::NUM_REGISTERS;
 pub enum Register {
     // Accumulator (implied in most operations)
     ACC,
-    
+
     // Audio I/O
-    ADCL,  // Left ADC input
-    ADCR,  // Right ADC input
-    DACL,  // Left DAC output
-    DACR,  // Right DAC output
-    
+    ADCL, // Left ADC input
+    ADCR, // Right ADC input
+    DACL, // Left DAC output
+    DACR, // Right DAC output
+
     // General purpose registers (32 total)
-    REG(u8),  // REG0-REG31
-    
+    REG(u8), // REG0-REG31
+
     // Special registers
-    ADDR_PTR,  // Address pointer for RMPA
-    LR,        // Low-pass/Ramp register (some variants)
-    
+    ADDR_PTR, // Address pointer for RMPA
+    LR,       // Low-pass/Ramp register (some variants)
+
     // Delay RAM address
     SIN0_RATE,
     SIN0_RANGE,
@@ -83,7 +83,7 @@ mod tests {
         // Valid registers
         assert!(Register::reg(0).is_ok());
         assert!(Register::reg(31).is_ok());
-        
+
         // Invalid registers
         assert!(Register::reg(32).is_err());
         assert!(Register::reg(100).is_err());
