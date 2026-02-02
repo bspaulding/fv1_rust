@@ -1,3 +1,5 @@
+use crate::constants::NUM_REGISTERS;
+
 /// FV-1 Registers
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[allow(non_camel_case_types)]
@@ -29,6 +31,26 @@ pub enum Register {
     RMP1_RANGE,
 }
 
+impl Register {
+    /// Create a general-purpose register with validation
+    pub fn reg(index: u8) -> Result<Self, RegisterError> {
+        if index < NUM_REGISTERS as u8 {
+            Ok(Register::REG(index))
+        } else {
+            Err(RegisterError::InvalidRegisterIndex {
+                index,
+                max: NUM_REGISTERS as u8 - 1,
+            })
+        }
+    }
+}
+
+/// Errors that can occur when working with registers
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum RegisterError {
+    InvalidRegisterIndex { index: u8, max: u8 },
+}
+
 /// Control inputs (POT0-POT2)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Control {
@@ -54,6 +76,17 @@ mod tests {
     fn test_register_creation() {
         let reg = Register::REG(0);
         assert_eq!(reg, Register::REG(0));
+    }
+
+    #[test]
+    fn test_register_validation() {
+        // Valid registers
+        assert!(Register::reg(0).is_ok());
+        assert!(Register::reg(31).is_ok());
+        
+        // Invalid registers
+        assert!(Register::reg(32).is_err());
+        assert!(Register::reg(100).is_err());
     }
 
     #[test]

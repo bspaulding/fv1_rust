@@ -36,7 +36,8 @@ pub enum Instruction {
     LDAX { reg: Register },
     
     // Filtering
-    /// Single-pole lowpass: ACC = C * ACC + (1-C) * [REG]
+    /// RDFX with double filtering: ACC = C * ACC + (1-C) * [REG]
+    /// Note: RDFX2 is the official FV-1 instruction name
     RDFX2 { reg: Register, coeff: f32 },
     
     // Logic and control
