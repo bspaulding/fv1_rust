@@ -219,6 +219,7 @@ impl<'source> Parser<'source> {
             Token::ADDR_PTR => Ok(Register::ADDR_PTR),
             Token::LR => Ok(Register::LR),
             Token::REG(n) => Ok(Register::REG(n)),
+            Token::POT(n) => Ok(Register::REG(n + 16)), // POT0-2 map to REG16-18
             Token::SIN0_RATE => Ok(Register::SIN0_RATE),
             Token::SIN0_RANGE => Ok(Register::SIN0_RANGE),
             Token::SIN1_RATE => Ok(Register::SIN1_RATE),
