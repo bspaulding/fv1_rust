@@ -168,7 +168,11 @@ impl<'source> Parser<'source> {
                 let freq = self.parse_number()? as u16;
                 self.expect(Token::Comma)?;
                 let amplitude = self.parse_number()? as u16;
-                Ok(Instruction::WLDS { lfo, freq, amplitude })
+                Ok(Instruction::WLDS {
+                    lfo,
+                    freq,
+                    amplitude,
+                })
             }
             Token::JAM => {
                 let lfo = self.parse_lfo()?;
@@ -182,7 +186,12 @@ impl<'source> Parser<'source> {
                 let flags = self.parse_cho_flags()?;
                 self.expect(Token::Comma)?;
                 let addr = self.parse_number()? as u16;
-                Ok(Instruction::CHO { mode, lfo, flags, addr })
+                Ok(Instruction::CHO {
+                    mode,
+                    lfo,
+                    flags,
+                    addr,
+                })
             }
             Token::ABSA => Ok(Instruction::ABSA),
             Token::SHL => Ok(Instruction::SHL),

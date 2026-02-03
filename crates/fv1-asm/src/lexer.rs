@@ -2,9 +2,9 @@ use logos::Logos;
 
 /// Token types for FV-1 assembly language
 #[derive(Logos, Debug, Clone, PartialEq)]
-#[logos(skip r"[ \t\r\n\f]+")]  // Skip whitespace
-#[logos(skip r";[^\n]*")]       // Skip comments starting with semicolon
-#[allow(non_camel_case_types)]  // Allow register names like ADDR_PTR, SIN0_RATE
+#[logos(skip r"[ \t\r\n\f]+")] // Skip whitespace
+#[logos(skip r";[^\n]*")] // Skip comments starting with semicolon
+#[allow(non_camel_case_types)] // Allow register names like ADDR_PTR, SIN0_RATE
 pub enum Token {
     // Instructions (case-insensitive)
     #[token("rdax", ignore(ascii_case))]

@@ -35,7 +35,10 @@ pub enum Statement {
     Instruction(Instruction),
 
     /// Label: Instruction - Label and instruction on the same line
-    LabeledInstruction { label: String, instruction: Instruction },
+    LabeledInstruction {
+        label: String,
+        instruction: Instruction,
+    },
 }
 
 /// Value in an expression or directive
@@ -96,7 +99,12 @@ impl Program {
     fn instruction_count(&self) -> usize {
         self.statements
             .iter()
-            .filter(|s| matches!(s, Statement::Instruction(_) | Statement::LabeledInstruction { .. }))
+            .filter(|s| {
+                matches!(
+                    s,
+                    Statement::Instruction(_) | Statement::LabeledInstruction { .. }
+                )
+            })
             .count()
     }
 }
