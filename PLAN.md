@@ -162,7 +162,7 @@ A comprehensive roadmap for building a complete Rust ecosystem for FV-1 DSP prog
 
 **Commits**:
 - `5387e59` - Implement enhanced CLI tool with multiple output formats
-- `<pending>` - Update documentation and mark milestone complete
+- `5c3eb11` - Update documentation and mark milestone complete
 
 ### 🚧 In Progress
 
