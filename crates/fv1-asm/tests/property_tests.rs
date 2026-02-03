@@ -57,25 +57,17 @@ fn valid_instruction_word() -> impl Strategy<Value = u32> {
             (0b01101_u32 << 27) | ((coeff & 0xFFFF) << 11) | (offset & 0x7FF)
         }),
         // MULX: opcode 0b01010, reg (6 bits)
-        valid_register().prop_map(|reg| {
-            (0b01010_u32 << 27) | ((reg & 0x3F) << 21)
-        }),
+        valid_register().prop_map(|reg| { (0b01010_u32 << 27) | ((reg & 0x3F) << 21) }),
         // CLR: opcode 0b01110
         Just(0b01110_u32 << 27),
         // NOP
         Just(0x00000000),
         // AND: opcode 0b01111, mask (24 bits)
-        (0u32..0x1000000).prop_map(|mask| {
-            (0b01111_u32 << 27) | (mask & 0xFFFFFF)
-        }),
+        (0u32..0x1000000).prop_map(|mask| { (0b01111_u32 << 27) | (mask & 0xFFFFFF) }),
         // OR: opcode 0b10000, mask (24 bits)
-        (0u32..0x1000000).prop_map(|mask| {
-            (0b10000_u32 << 27) | (mask & 0xFFFFFF)
-        }),
+        (0u32..0x1000000).prop_map(|mask| { (0b10000_u32 << 27) | (mask & 0xFFFFFF) }),
         // XOR: opcode 0b10001, mask (24 bits)
-        (0u32..0x1000000).prop_map(|mask| {
-            (0b10001_u32 << 27) | (mask & 0xFFFFFF)
-        }),
+        (0u32..0x1000000).prop_map(|mask| { (0b10001_u32 << 27) | (mask & 0xFFFFFF) }),
     ]
 }
 
@@ -83,12 +75,12 @@ fn valid_instruction_word() -> impl Strategy<Value = u32> {
 fn valid_register() -> impl Strategy<Value = u32> {
     prop_oneof![
         // ADCL, ADCR, DACL, DACR, ADDR_PTR, LR
-        Just(0u32),  // ADCL
-        Just(1u32),  // ADCR
-        Just(2u32),  // DACL
-        Just(3u32),  // DACR
-        Just(4u32),  // ADDR_PTR
-        Just(5u32),  // LR
+        Just(0u32), // ADCL
+        Just(1u32), // ADCR
+        Just(2u32), // DACL
+        Just(3u32), // DACR
+        Just(4u32), // ADDR_PTR
+        Just(5u32), // LR
         // REG0-REG31 (encoded as 16-47)
         (16u32..48),
     ]
@@ -128,10 +120,7 @@ mod regular_tests {
         let program2 = parser2.parse().unwrap();
 
         // Should have the same number of instructions
-        assert_eq!(
-            program1.instructions().len(),
-            program2.instructions().len()
-        );
+        assert_eq!(program1.instructions().len(), program2.instructions().len());
     }
 
     #[test]

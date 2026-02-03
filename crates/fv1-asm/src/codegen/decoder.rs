@@ -189,7 +189,9 @@ pub fn decode_instruction(word: u32) -> Result<Instruction, CodegenError> {
             })
         }
 
-        _ => Err(CodegenError::InvalidOpcode { opcode: opcode as u8 }),
+        _ => Err(CodegenError::InvalidOpcode {
+            opcode: opcode as u8,
+        }),
     }
 }
 

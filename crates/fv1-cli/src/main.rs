@@ -201,8 +201,7 @@ fn disassemble_file(input: PathBuf, output: Option<PathBuf>) -> Result<()> {
         .wrap_err_with(|| format!("Failed to read input file: {}", input.display()))?;
 
     // Create binary from bytes
-    let binary = fv1_asm::Binary::from_bytes(&bytes)
-        .wrap_err("Failed to parse binary file")?;
+    let binary = fv1_asm::Binary::from_bytes(&bytes).wrap_err("Failed to parse binary file")?;
 
     // Disassemble
     let disassembler = fv1_asm::Disassembler::new();
