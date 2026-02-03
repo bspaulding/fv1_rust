@@ -6,6 +6,65 @@ A comprehensive roadmap for building a complete Rust ecosystem for FV-1 DSP prog
 
 -----
 
+## 📊 Progress Tracker
+
+### ✅ Completed Milestones
+
+#### Phase 1: Milestone 1.1 - Project Setup & Core Types (Week 1)
+**Status**: ✅ COMPLETE  
+**Completed**: 2026-02-02
+
+**Deliverables**:
+- ✅ Cargo workspace created with three crates: `fv1-asm`, `fv1-cli`, `fv1-examples`
+- ✅ Core type definitions implemented:
+  - `Register` enum with all FV-1 registers (ACC, ADCL, ADCR, DACL, DACR, REG(0-31), special registers)
+  - `Control` enum for POT0-POT2 inputs
+  - `Lfo` enum for oscillators (SIN0, SIN1, RMP0, RMP1)
+  - Register validation with bounds checking via `Register::reg()` method
+- ✅ Complete FV-1 instruction set implemented as Rust enums:
+  - Accumulator operations (RDAX, RDA, RMPA, WRAX, WRA, WRAP)
+  - Mathematical operations (MULX, RDFX, ABSA, LDAX)
+  - Filtering operations (RDFX2)
+  - Logic and control (SOF, AND, OR, XOR, SHL, SHR, CLR, NOP)
+  - Conversion operations (EXP, LOG)
+  - Conditional execution (SKP with conditions)
+  - LFO control (WLDS, JAM, CHO)
+- ✅ Hardware constants defined (sample rate, memory sizes, fixed-point formats)
+- ✅ 11 passing unit tests covering all core types
+- ✅ GitHub Actions CI/CD workflow configured:
+  - Test job (cargo test --all)
+  - Build job (cargo build --all)
+  - Fmt job (code formatting checks)
+  - Clippy job (linting)
+  - Cargo caching for faster builds
+  - Security permissions configured
+- ✅ Code review completed, feedback addressed
+- ✅ CodeQL security scan passed with 0 alerts
+- ✅ Documentation: README.md created with project overview
+
+**Commits**:
+- `725b8b1` - Implement Milestone 1.1: Project setup and core types
+- `a0c1f32` - Address code review feedback: improve documentation and add register validation
+- `335e486` - Add GitHub CI workflow for tests and linting
+- `d4dfd8b` - Add explicit permissions to CI workflow for security
+
+### 🚧 In Progress
+
+*No active work items*
+
+### 📋 Next Up
+
+#### Phase 1: Milestone 1.2 - Assembler Core (Week 2-3)
+**Status**: 📋 PLANNED
+
+**Goals**:
+- Implement lexer for SpinASM syntax
+- Build parser to create Abstract Syntax Tree (AST)
+- Add support for labels and symbolic addressing
+- Implement expression evaluation for coefficients
+
+-----
+
 ## PHASE 1: Foundation - Rust Assembler (Option B)
 
 ### Milestone 1.1: Project Setup & Core Types (Week 1)
