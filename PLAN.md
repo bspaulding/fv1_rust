@@ -127,20 +127,50 @@ A comprehensive roadmap for building a complete Rust ecosystem for FV-1 DSP prog
 **Commits**:
 - `2362130` - Implement Milestone 1.3: Code Generation module with encoder and assembler
 
+#### Phase 1: Milestone 1.4 - CLI Tool Enhancement (Week 4-5)
+**Status**: ✅ COMPLETE  
+**Completed**: 2026-02-03
+
+**Deliverables**:
+- ✅ Enhanced CLI tool (`fv1-cli`):
+  - Command-line argument parsing using `clap`
+  - File input support for `.asm` files
+  - Multiple output formats (binary, hex, C array)
+  - Output file path configuration
+  - Verbose mode for detailed progress output
+  - Optimization flag support
+- ✅ Error reporting with miette:
+  - Beautiful diagnostic messages
+  - Context lines for errors
+  - Terminal hyperlinks support
+  - Unicode symbols for better readability
+- ✅ Example FV-1 assembly programs:
+  - `passthrough.asm`: Simple audio pass-through
+  - `gain_control.asm`: Volume control using POT0
+  - `delay_echo.asm`: Basic delay/echo effect with feedback
+  - All examples properly documented with comments
+- ✅ Parser enhancement:
+  - POT0-2 tokens now accepted as registers
+  - Maps POT0-2 to appropriate register addresses
+- ✅ Documentation updates:
+  - README.md updated with CLI usage examples
+  - Example program documentation
+  - Feature list and current status
+- ✅ All existing tests passing (64 total)
+- ✅ CLI tested with all output formats
+- ✅ Error reporting verified with invalid input
+
+**Commits**:
+- `5387e59` - Implement enhanced CLI tool with multiple output formats
+- `<pending>` - Update documentation and mark milestone complete
+
 ### 🚧 In Progress
 
 *No active work items*
 
 ### 📋 Next Up
 
-#### Phase 1: Milestone 1.4 - CLI Tool Enhancement (Week 4-5)
-**Status**: 📋 PLANNED
-
-**Goals**:
-- Enhance CLI tool to use new assembler and code generator
-- Add command-line options for output formats (binary, hex, C array)
-- Add error reporting with miette diagnostics
-- Add example FV-1 programs
+*See detailed phase plans below for upcoming milestones*
 
 -----
 
