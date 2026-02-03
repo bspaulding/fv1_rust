@@ -7,3 +7,6 @@ license.workspace = true
 repository.workspace = true
 
 [dependencies]
+logos = "0.14"
+thiserror = "1.0"
+miette = { version = "7.0", features = ["fancy"] }
