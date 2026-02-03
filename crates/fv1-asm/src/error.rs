@@ -72,4 +72,28 @@ pub enum CodegenError {
     #[error("program too large: {size} instructions (max {max})")]
     #[diagnostic(code(codegen::program_too_large))]
     ProgramTooLarge { size: usize, max: usize },
+
+    #[error("invalid opcode: 0x{opcode:02X}")]
+    #[diagnostic(code(codegen::invalid_opcode))]
+    InvalidOpcode { opcode: u8 },
+
+    #[error("invalid register bits: 0x{bits:02X}")]
+    #[diagnostic(code(codegen::invalid_register))]
+    InvalidRegister { bits: u8 },
+
+    #[error("invalid skip condition bits: 0x{bits:02X}")]
+    #[diagnostic(code(codegen::invalid_skip_condition))]
+    InvalidSkipCondition { bits: u8 },
+
+    #[error("invalid LFO bits: 0x{bits:02X}")]
+    #[diagnostic(code(codegen::invalid_lfo))]
+    InvalidLfo { bits: u8 },
+
+    #[error("invalid CHO mode bits: 0x{bits:02X}")]
+    #[diagnostic(code(codegen::invalid_cho_mode))]
+    InvalidChoMode { bits: u8 },
+
+    #[error("invalid binary size: {size} bytes (expected {expected})")]
+    #[diagnostic(code(codegen::invalid_binary_size))]
+    InvalidBinarySize { size: usize, expected: usize },
 }

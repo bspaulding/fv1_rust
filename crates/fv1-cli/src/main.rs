@@ -194,10 +194,36 @@ fn assemble_file(
     Ok(())
 }
 
-fn disassemble_file(input: PathBuf, _output: Option<PathBuf>) -> Result<()> {
-    // TODO: Implement disassembler
-    println!("Disassembling: {}", input.display());
-    println!("⚠ Disassembler not yet implemented");
+fn disassemble_file(input: PathBuf, output: Option<PathBuf>) -> Result<()> {
+    // Read binary file
+    let bytes = fs::read(&input)
+        .into_diagnostic()
+        .wrap_err_with(|| format!("Failed to read input file: {}", input.display()))?;
+
+    // Create binary from bytes
+    let binary = fv1_asm::Binary::from_bytes(&bytes)
+        .wrap_err("Failed to parse binary file")?;
+
+    // Disassemble
+    let disassembler = fv1_asm::Disassembler::new();
+    let source = disassembler
+        .disassemble_to_source(&binary)
+        .wrap_err("Failed to disassemble binary")?;
+
+    // Determine output path
+    let output_path = output.unwrap_or_else(|| {
+        let mut path = input.clone();
+        path.set_extension("asm");
+        path
+    });
+
+    // Write output
+    fs::write(&output_path, source)
+        .into_diagnostic()
+        .wrap_err_with(|| format!("Failed to write output file: {}", output_path.display()))?;
+
+    println!("✓ Successfully disassembled to {}", output_path.display());
+
     Ok(())
 }
 

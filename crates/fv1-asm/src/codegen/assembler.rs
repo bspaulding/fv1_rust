@@ -107,6 +107,24 @@ impl Binary {
         &self.instructions
     }
 
+    /// Create a Binary from raw bytes (512 bytes, big-endian)
+    pub fn from_bytes(bytes: &[u8]) -> Result<Self, CodegenError> {
+        if bytes.len() != 512 {
+            return Err(CodegenError::InvalidBinarySize {
+                size: bytes.len(),
+                expected: 512,
+            });
+        }
+
+        let mut instructions = Vec::with_capacity(MAX_INSTRUCTIONS);
+        for chunk in bytes.chunks_exact(4) {
+            let word = u32::from_be_bytes([chunk[0], chunk[1], chunk[2], chunk[3]]);
+            instructions.push(word);
+        }
+
+        Ok(Self { instructions })
+    }
+
     /// Export as raw binary bytes (512 bytes, big-endian)
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = Vec::with_capacity(512);
