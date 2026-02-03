@@ -2,8 +2,7 @@
 ///
 /// This module provides convenience functions for creating instructions
 /// with a more ergonomic API than constructing the enums directly.
-
-use crate::{Instruction, Register, Lfo, SkipCondition, ChoMode, ChoFlags};
+use crate::{ChoFlags, ChoMode, Instruction, Lfo, Register, SkipCondition};
 
 // Accumulator operations
 
@@ -129,7 +128,11 @@ pub fn skp(condition: SkipCondition, offset: i8) -> Instruction {
 
 /// Write LFO frequency
 pub fn wlds(lfo: Lfo, freq: u16, amplitude: u16) -> Instruction {
-    Instruction::WLDS { lfo, freq, amplitude }
+    Instruction::WLDS {
+        lfo,
+        freq,
+        amplitude,
+    }
 }
 
 /// JAM LFO
@@ -141,13 +144,18 @@ pub fn jam(lfo: Lfo) -> Instruction {
 
 /// CHO - Complex LFO operation
 pub fn cho(mode: ChoMode, lfo: Lfo, flags: ChoFlags, addr: u16) -> Instruction {
-    Instruction::CHO { mode, lfo, flags, addr }
+    Instruction::CHO {
+        mode,
+        lfo,
+        flags,
+        addr,
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_rdax() {
         let inst = rdax(Register::ADCL, 1.0);
@@ -159,7 +167,7 @@ mod tests {
             _ => panic!("Wrong instruction type"),
         }
     }
-    
+
     #[test]
     fn test_wrax() {
         let inst = wrax(Register::DACL, 0.5);
@@ -171,7 +179,7 @@ mod tests {
             _ => panic!("Wrong instruction type"),
         }
     }
-    
+
     #[test]
     fn test_sof() {
         let inst = sof(0.5, 0.25);
@@ -183,7 +191,7 @@ mod tests {
             _ => panic!("Wrong instruction type"),
         }
     }
-    
+
     #[test]
     fn test_mulx() {
         let inst = mulx(Register::REG(0));
@@ -194,13 +202,13 @@ mod tests {
             _ => panic!("Wrong instruction type"),
         }
     }
-    
+
     #[test]
     fn test_clr() {
         let inst = clr();
         assert_eq!(inst, Instruction::CLR);
     }
-    
+
     #[test]
     fn test_nop() {
         let inst = nop();

@@ -11,17 +11,17 @@ struct ProgramStatements {
 impl Parse for ProgramStatements {
     fn parse(input: ParseStream) -> Result<Self> {
         let mut statements = Vec::new();
-        
+
         while !input.is_empty() {
             let expr: Expr = input.parse()?;
             statements.push(expr);
-            
+
             // Consume optional semicolon
             if input.peek(Token![;]) {
                 let _: Token![;] = input.parse()?;
             }
         }
-        
+
         Ok(ProgramStatements { statements })
     }
 }
@@ -43,7 +43,7 @@ impl Parse for ProgramStatements {
 pub fn fv1_program(input: TokenStream) -> TokenStream {
     let program_stmts = parse_macro_input!(input as ProgramStatements);
     let instructions = program_stmts.statements;
-    
+
     let output = quote! {
         {
             let mut builder = ::fv1_dsl::ProgramBuilder::new();
@@ -51,6 +51,6 @@ pub fn fv1_program(input: TokenStream) -> TokenStream {
             builder.build()
         }
     };
-    
+
     output.into()
 }
