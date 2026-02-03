@@ -1,0 +1,17 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/fv1-asm",
+    "crates/fv1-cli",
+    "crates/fv1-examples",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["FV-1 Rust Contributors"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/bspaulding/fv1_rust"
+
+[workspace.dependencies]
+fv1-asm = { path = "crates/fv1-asm" }
