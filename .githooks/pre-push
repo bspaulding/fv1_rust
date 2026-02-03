@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(git rev-parse --show-toplevel)"
+cd "$repo_root"
+
+echo "Running CI-equivalent checks: fmt, clippy, build, test"
+
+cargo fmt --all -- --check
+cargo clippy --all --all-targets -- -D warnings
+cargo build --all --verbose
+cargo test --all --verbose
