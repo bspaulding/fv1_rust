@@ -164,6 +164,89 @@ A comprehensive roadmap for building a complete Rust ecosystem for FV-1 DSP prog
 - `5387e59` - Implement enhanced CLI tool with multiple output formats
 - `5c3eb11` - Update documentation and mark milestone complete
 
+#### Phase 1: Milestone 1.5 - CLI Tool with Subcommands (Week 4-5)
+**Status**: ✅ COMPLETE  
+**Completed**: 2026-02-03
+
+**Deliverables**:
+- ✅ CLI restructured with subcommand architecture:
+  - `assemble` subcommand: Assembles .asm files to binary/hex/C array formats
+  - `check` subcommand: Validates assembly files without generating output
+  - `disassemble` subcommand: Stub implementation (marked as TODO)
+- ✅ Assemble subcommand features:
+  - Input/output file specification
+  - Multiple output formats (bin, hex, C array)
+  - Optimization flag (-O/--optimize)
+  - Verbose output mode (-v/--verbose)
+  - Custom C array naming (--name)
+- ✅ Check subcommand:
+  - Validates assembly syntax and structure
+  - Reports instruction and label counts
+  - Provides clear success/error messages
+- ✅ Improved CLI structure:
+  - Better command organization with subcommands
+  - Consistent help messages for all commands
+  - Proper argument parsing with clap
+- ✅ All existing tests passing (64 total)
+- ✅ Clippy and rustfmt compliance
+- ✅ CLI tested with all three subcommands
+
+**Commits**:
+- `2a458e7` - Implement Milestone 1.5: CLI tool with subcommands
+- `c55ed89` - Update PLAN.md: Mark Milestone 1.5 as complete
+
+#### Phase 1: Milestone 1.6 - Disassembler Implementation (Week 5)
+**Status**: ✅ COMPLETE  
+**Completed**: 2026-02-03
+
+**Deliverables**:
+- ✅ Decoder module (`codegen/decoder.rs`):
+  - Converts 32-bit FV-1 machine code back to AST instructions
+  - Decodes all FV-1 instruction types (25+ opcodes)
+  - Handles S1.14 and S.10 fixed-point formats with proper sign extension
+  - Comprehensive error handling with detailed error types
+- ✅ Disassembler module (`codegen/disassembler.rs`):
+  - Converts binary programs to human-readable assembly source
+  - Formats instructions with proper syntax
+  - Optional NOP stripping
+  - Register name formatting
+- ✅ Binary loading (`Binary::from_bytes()`):
+  - Loads FV-1 binary from 512-byte files
+  - Validates file size
+- ✅ CLI integration:
+  - Full `disassemble` subcommand implementation
+  - Reads binary files and writes assembly source
+  - Error reporting with miette
+- ✅ Fixed-point encoding improvements:
+  - Fixed S1.14 edge case where 1.0 was encoding as -1.0
+  - Added clamping to valid signed ranges before masking
+  - S1.14: [-16384, 16383] representing [-2.0, ~2.0)
+  - S.10: [-512, 511] representing [-1.0, ~1.0)
+- ✅ Property-based testing:
+  - Added `proptest` dependency for property testing
+  - Implemented roundtrip property: `disassemble(assemble(disassemble(x))) == disassemble(x)`
+  - Tests random valid instruction sequences
+  - 100 test cases per property test run
+- ✅ Comprehensive testing:
+  - 66 unit tests (existing + new decoder tests)
+  - 4 integration tests
+  - 3 property tests
+  - 2 example tests
+  - **Total: 75 tests, all passing**
+- ✅ Manual verification:
+  - All three example programs roundtrip correctly
+  - Binary → disassemble → assemble → binary produces identical output
+- ✅ Code quality:
+  - Clippy passes with `-D warnings`
+  - rustfmt compliant
+  - No unsafe code
+  - Comprehensive documentation
+
+**Commits**:
+- `c96564f` - Implement disassembler and fix S1.14 encoding edge cases
+- `fdd13b7` - Add property tests for disassembler roundtrip
+- `427d50d` - Fix clippy warnings
+
 ### 🚧 In Progress
 
 *No active work items*

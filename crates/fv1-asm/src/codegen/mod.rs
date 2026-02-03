@@ -3,8 +3,12 @@
 //! This module handles the conversion from parsed AST to FV-1 machine code.
 
 pub mod assembler;
+pub mod decoder;
+pub mod disassembler;
 pub mod encoder;
 
 // Re-export main types for convenience
 pub use assembler::{Assembler, Binary};
+pub use decoder::decode_instruction;
+pub use disassembler::Disassembler;
 pub use encoder::encode_instruction;

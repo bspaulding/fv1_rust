@@ -9,7 +9,7 @@ pub mod register;
 
 // Re-export commonly used types
 pub use ast::{Directive, Program, Statement, Value};
-pub use codegen::{Assembler, Binary};
+pub use codegen::{Assembler, Binary, Disassembler};
 pub use constants::*;
 pub use error::{CodegenError, ParseError};
 pub use instruction::{ChoFlags, ChoMode, Instruction, SkipCondition};

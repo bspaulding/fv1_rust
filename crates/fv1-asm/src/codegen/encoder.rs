@@ -211,9 +211,11 @@ fn encode_s114(value: f32) -> Result<u32, CodegenError> {
         return Err(CodegenError::CoefficientOutOfRange { value });
     }
 
-    // Convert to S1.14: sign bit + 14 fractional bits
+    // Convert to S1.14: sign bit + 14 fractional bits (15-bit signed)
+    // Range: -16384 to +16383 (representing -2.0 to +1.99993896...)
     let scaled = (value * 16384.0).round() as i32;
-    Ok((scaled & 0x7FFF) as u32)
+    let clamped = scaled.clamp(-16384, 16383);
+    Ok((clamped & 0x7FFF) as u32)
 }
 
 /// Encode S.10 fixed-point coefficient (-1.0 to ~1.0)
@@ -222,8 +224,11 @@ fn encode_s10(value: f32) -> Result<u32, CodegenError> {
         return Err(CodegenError::CoefficientOutOfRange { value });
     }
 
+    // Convert to S.10: 11-bit signed format
+    // Range: -512 to +511 (representing -1.0 to +0.9990234...)
     let scaled = (value * 512.0).round() as i32;
-    Ok((scaled & 0x7FF) as u32)
+    let clamped = scaled.clamp(-512, 511);
+    Ok((clamped & 0x7FF) as u32)
 }
 
 /// Encode 16-bit delay address
@@ -344,14 +349,15 @@ mod tests {
     #[test]
     fn test_encode_s114_positive() {
         let result = encode_s114(1.0).unwrap();
-        assert_eq!(result, 16384); // 1.0 * 16384
+        assert_eq!(result, 16383); // 1.0 * 16384 clamped to max 15-bit signed positive (16383)
     }
 
     #[test]
     fn test_encode_s114_negative() {
         let result = encode_s114(-1.0).unwrap();
-        // -1.0 * 16384 = -16384, masked to 15 bits
-        assert_eq!(result & 0x7FFF, 0x7FFF - 16384 + 1);
+        // -1.0 * 16384 = -16384, in 15-bit two's complement
+        let expected = (-16384i32 & 0x7FFF) as u32;
+        assert_eq!(result, expected);
     }
 
     #[test]
