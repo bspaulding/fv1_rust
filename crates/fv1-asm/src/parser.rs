@@ -10,6 +10,7 @@ use crate::{
 pub struct Parser<'source> {
     tokens: Vec<(Result<Token, ()>, std::ops::Range<usize>)>,
     pos: usize,
+    /// Source code (kept for future error reporting improvements)
     #[allow(dead_code)]
     source: &'source str,
 }
@@ -74,35 +75,35 @@ impl<'source> Parser<'source> {
             Token::RDAX => {
                 let reg = self.parse_register()?;
                 self.expect(Token::Comma)?;
-                let coeff = self.parse_number()? as f32;
+                let coeff = self.parse_number()?;
                 Ok(Instruction::RDAX { reg, coeff })
             }
             Token::RDA => {
                 let addr = self.parse_number()? as u16;
                 self.expect(Token::Comma)?;
-                let coeff = self.parse_number()? as f32;
+                let coeff = self.parse_number()?;
                 Ok(Instruction::RDA { addr, coeff })
             }
             Token::WRAX => {
                 let reg = self.parse_register()?;
                 self.expect(Token::Comma)?;
-                let coeff = self.parse_number()? as f32;
+                let coeff = self.parse_number()?;
                 Ok(Instruction::WRAX { reg, coeff })
             }
             Token::WRA => {
                 let addr = self.parse_number()? as u16;
                 self.expect(Token::Comma)?;
-                let coeff = self.parse_number()? as f32;
+                let coeff = self.parse_number()?;
                 Ok(Instruction::WRA { addr, coeff })
             }
             Token::WRAP => {
                 let addr = self.parse_number()? as u16;
                 self.expect(Token::Comma)?;
-                let coeff = self.parse_number()? as f32;
+                let coeff = self.parse_number()?;
                 Ok(Instruction::WRAP { addr, coeff })
             }
             Token::RMPA => {
-                let coeff = self.parse_number()? as f32;
+                let coeff = self.parse_number()?;
                 Ok(Instruction::RMPA { coeff })
             }
             Token::MULX => {
@@ -112,13 +113,13 @@ impl<'source> Parser<'source> {
             Token::RDFX => {
                 let reg = self.parse_register()?;
                 self.expect(Token::Comma)?;
-                let coeff = self.parse_number()? as f32;
+                let coeff = self.parse_number()?;
                 Ok(Instruction::RDFX { reg, coeff })
             }
             Token::RDFX2 => {
                 let reg = self.parse_register()?;
                 self.expect(Token::Comma)?;
-                let coeff = self.parse_number()? as f32;
+                let coeff = self.parse_number()?;
                 Ok(Instruction::RDFX2 { reg, coeff })
             }
             Token::LDAX => {
@@ -126,9 +127,9 @@ impl<'source> Parser<'source> {
                 Ok(Instruction::LDAX { reg })
             }
             Token::SOF => {
-                let coeff = self.parse_number()? as f32;
+                let coeff = self.parse_number()?;
                 self.expect(Token::Comma)?;
-                let offset = self.parse_number()? as f32;
+                let offset = self.parse_number()?;
                 Ok(Instruction::SOF { coeff, offset })
             }
             Token::AND => {
@@ -144,15 +145,15 @@ impl<'source> Parser<'source> {
                 Ok(Instruction::XOR { mask })
             }
             Token::EXP => {
-                let coeff = self.parse_number()? as f32;
+                let coeff = self.parse_number()?;
                 self.expect(Token::Comma)?;
-                let offset = self.parse_number()? as f32;
+                let offset = self.parse_number()?;
                 Ok(Instruction::EXP { coeff, offset })
             }
             Token::LOG => {
-                let coeff = self.parse_number()? as f32;
+                let coeff = self.parse_number()?;
                 self.expect(Token::Comma)?;
-                let offset = self.parse_number()? as f32;
+                let offset = self.parse_number()?;
                 Ok(Instruction::LOG { coeff, offset })
             }
             Token::SKP => {
@@ -222,12 +223,12 @@ impl<'source> Parser<'source> {
     }
 
     /// Parse a numeric value (float or integer)
-    fn parse_number(&mut self) -> Result<f64, ParseError> {
+    fn parse_number(&mut self) -> Result<f32, ParseError> {
         let (token, span) = self.advance_checked()?;
 
         match token {
-            Token::Float(f) => Ok(f as f64),
-            Token::Integer(i) => Ok(i as f64),
+            Token::Float(f) => Ok(f),
+            Token::Integer(i) => Ok(i as f32),
             _ => Err(ParseError::ExpectedNumber { span }),
         }
     }
@@ -283,13 +284,21 @@ impl<'source> Parser<'source> {
         }
     }
 
-    /// Parse CHO flags (simplified - just returns default flags for now)
+    /// Parse CHO flags
+    /// Note: This is a simplified implementation that returns default flags.
+    /// Full flag parsing will be implemented when CHO instruction support is needed.
     fn parse_cho_flags(&mut self) -> Result<ChoFlags, ParseError> {
-        // For now, parse a single identifier or integer representing flags
-        // This is simplified; a full implementation would parse flag combinations
-        let (_token, _span) = self.advance_checked()?;
+        // For now, parse an integer representing flags as a bitmask
+        let (token, _span) = self.advance_checked()?;
 
-        // Return default flags
+        // Parse as integer and convert to flags (simplified)
+        let _flags_value = match token {
+            Token::Integer(i) => i,
+            _ => 0,
+        };
+
+        // TODO: Parse actual flag combinations (rptr2, na, compc, compa)
+        // For now, return default flags
         Ok(ChoFlags {
             rptr2: false,
             na: false,
@@ -343,13 +352,13 @@ impl<'source> Parser<'source> {
 
     /// Parse a value (for directives)
     fn parse_value(&mut self) -> Result<Value, ParseError> {
-        let (token, _span) = self.advance_checked()?;
+        let (token, span) = self.advance_checked()?;
 
         match token {
             Token::Float(f) => Ok(Value::Float(f)),
             Token::Integer(i) => Ok(Value::Integer(i)),
             Token::Identifier(s) => Ok(Value::Identifier(s)),
-            _ => Err(ParseError::ExpectedNumber { span: 0..0 }),
+            _ => Err(ParseError::ExpectedNumber { span }),
         }
     }
 
