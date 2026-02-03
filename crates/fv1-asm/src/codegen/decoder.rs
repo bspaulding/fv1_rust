@@ -202,7 +202,7 @@ fn decode_register(bits: u32) -> Result<Register, CodegenError> {
         0b00011 => Ok(Register::DACR),
         0b00100 => Ok(Register::ADDR_PTR),
         0b00101 => Ok(Register::LR),
-        n if n >= 16 && n < 48 => Ok(Register::REG((n - 16) as u8)),
+        n if (16..48).contains(&n) => Ok(Register::REG((n - 16) as u8)),
         _ => Err(CodegenError::InvalidRegister { bits: bits as u8 }),
     }
 }

@@ -1,5 +1,7 @@
 // Property tests for FV-1 assembler/disassembler
 
+#![allow(clippy::identity_op)] // Allow 0 << 27 for readability in opcode definitions
+
 use fv1_asm::{Assembler, Binary, Disassembler, Parser};
 use proptest::prelude::*;
 
