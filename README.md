@@ -1,5 +1,7 @@
 # FV-1 Rust
 
+⚠️ This is currently copilot slop ⚠️
+
 A comprehensive Rust ecosystem for programming the Spin Semiconductor FV-1 DSP chip.
 
 ## Project Structure
