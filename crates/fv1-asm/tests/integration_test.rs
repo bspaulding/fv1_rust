@@ -105,6 +105,9 @@ fn test_program_size_validation() {
     assert!(result.is_err());
     assert!(matches!(
         result.unwrap_err(),
-        fv1_asm::CodegenError::ProgramTooLarge { size: 129, max: 128 }
+        fv1_asm::CodegenError::ProgramTooLarge {
+            size: 129,
+            max: 128
+        }
     ));
 }
