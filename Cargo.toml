@@ -4,6 +4,8 @@ members = [
     "crates/fv1-asm",
     "crates/fv1-cli",
     "crates/fv1-examples",
+    "crates/fv1-dsl",
+    "crates/fv1-dsl-macro",
 ]
 
 [workspace.package]
@@ -15,3 +17,5 @@ repository = "https://github.com/bspaulding/fv1_rust"
 
 [workspace.dependencies]
 fv1-asm = { path = "crates/fv1-asm" }
+fv1-dsl = { path = "crates/fv1-dsl" }
+fv1-dsl-macro = { path = "crates/fv1-dsl-macro" }

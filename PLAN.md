@@ -1560,6 +1560,8 @@ Create `fv1-examples/` directory with standard effects:
 ## PHASE 2: Rust DSL (Option A)
 
 ### Milestone 2.1: Macro Foundation (Week 7-8)
+**Status**: ✅ COMPLETE  
+**Completed**: 2026-02-03
 
 **Goal**: Create procedural macros for writing FV-1 programs in Rust.
 
@@ -1722,6 +1724,22 @@ fn main() {
     std::fs::write("output.bin", binary.to_bytes()).unwrap();
 }
 ```
+
+#### Implementation Summary
+
+**Implemented**:
+- ✅ Created `fv1-dsl-macro` crate with procedural macro for `fv1_program!`
+- ✅ Created `fv1-dsl` crate with `ProgramBuilder` for fluent API
+- ✅ Implemented `ops` module with helper functions for all FV-1 instructions
+- ✅ Added comprehensive tests for builder API and macro
+- ✅ Integrated with existing `fv1-asm` crate for program assembly
+- ✅ Both builder pattern (consuming self) and mutable reference APIs available
+
+**Key Features**:
+- Ergonomic Rust API for creating FV-1 programs
+- Macro syntax closely resembles assembly but with Rust's type safety
+- All FV-1 instructions supported through helper functions
+- Full integration with existing assembler infrastructure
 
 -----
 

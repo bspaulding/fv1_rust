@@ -1,0 +1,13 @@
+[package]
+name = "fv1-dsl"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+fv1-asm.workspace = true
+fv1-dsl-macro = { path = "../fv1-dsl-macro" }
+
+[dev-dependencies]
