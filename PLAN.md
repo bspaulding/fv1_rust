@@ -87,20 +87,60 @@ A comprehensive roadmap for building a complete Rust ecosystem for FV-1 DSP prog
 - `3bb2c6e` - Implement Milestone 1.2 core: lexer, parser, AST, and error types
 - `85fbef2` - Address code review feedback: fix return types and improve error handling
 
+#### Phase 1: Milestone 1.3 - Code Generation (Week 3-4)
+**Status**: ✅ COMPLETE  
+**Completed**: 2026-02-03
+
+**Deliverables**:
+- ✅ Code generation module (`codegen/`):
+  - `encoder.rs`: Instruction encoding to 32-bit FV-1 machine code
+  - `assembler.rs`: Program assembly and binary generation
+  - `mod.rs`: Module exports
+- ✅ Instruction encoding implementation:
+  - All accumulator operations (RDAX, WRAX, RDA, WRA, WRAP, RMPA)
+  - All mathematical operations (MULX, RDFX, RDFX2, LDAX, ABSA)
+  - All logic operations (AND, OR, XOR, SHL, SHR)
+  - Control instructions (CLR, NOP, SOF)
+  - Conversion operations (EXP, LOG)
+  - Conditional execution (SKP with all conditions)
+  - LFO control (WLDS, JAM, CHO)
+- ✅ Fixed-point encoding functions:
+  - S1.14 format for coefficients (-2.0 to ~2.0)
+  - S.10 format for offsets (-1.0 to ~1.0)
+  - 16-bit address encoding with validation
+- ✅ Register encoding (5-bit fields)
+- ✅ Binary output formats:
+  - Raw bytes (512 bytes, big-endian)
+  - Intel HEX format for programming
+  - C array format for firmware embedding
+- ✅ Program assembler:
+  - Converts parsed AST to FV-1 binary
+  - Validates program size (max 128 instructions)
+  - Automatic NOP padding to 128 instructions
+  - Optimization support (framework for future optimizations)
+- ✅ 22 new unit tests (60 total), all passing
+- ✅ Integrated into library exports
+- ✅ Clippy and rustfmt compliance
+- ✅ Code review completed, feedback addressed
+- ✅ CodeQL security scan passed with 0 alerts
+
+**Commits**:
+- `2362130` - Implement Milestone 1.3: Code Generation module with encoder and assembler
+
 ### 🚧 In Progress
 
 *No active work items*
 
 ### 📋 Next Up
 
-#### Phase 1: Milestone 1.3 - Code Generation (Week 3-4)
+#### Phase 1: Milestone 1.4 - CLI Tool Enhancement (Week 4-5)
 **Status**: 📋 PLANNED
 
 **Goals**:
-- Implement binary code generation from AST
-- FV-1 instruction encoding
-- Memory allocation and management
-- Output .hex or binary file format
+- Enhance CLI tool to use new assembler and code generator
+- Add command-line options for output formats (binary, hex, C array)
+- Add error reporting with miette diagnostics
+- Add example FV-1 programs
 
 -----
 

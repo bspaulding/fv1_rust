@@ -3,9 +3,7 @@
 //! Assembles parsed programs into FV-1 binary format
 
 use crate::{
-    ast::Program,
-    codegen::encoder::encode_instruction,
-    constants::MAX_INSTRUCTIONS,
+    ast::Program, codegen::encoder::encode_instruction, constants::MAX_INSTRUCTIONS,
     error::CodegenError,
 };
 
@@ -249,7 +247,10 @@ mod tests {
         assert!(result.is_err());
         assert!(matches!(
             result.unwrap_err(),
-            CodegenError::ProgramTooLarge { size: 129, max: 128 }
+            CodegenError::ProgramTooLarge {
+                size: 129,
+                max: 128
+            }
         ));
     }
 

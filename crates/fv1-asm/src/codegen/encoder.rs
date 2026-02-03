@@ -156,7 +156,11 @@ pub fn encode_instruction(inst: &Instruction) -> Result<u32, CodegenError> {
         }
 
         // LFO control
-        Instruction::WLDS { lfo, freq, amplitude } => {
+        Instruction::WLDS {
+            lfo,
+            freq,
+            amplitude,
+        } => {
             let opcode = 0b10111_u32 << 27;
             let lfo_bits = encode_lfo(*lfo) << 25;
             let freq_bits = (*freq as u32 & 0x1FF) << 9;
@@ -170,7 +174,12 @@ pub fn encode_instruction(inst: &Instruction) -> Result<u32, CodegenError> {
             Ok(opcode | lfo_bits)
         }
 
-        Instruction::CHO { mode, lfo, flags, addr } => {
+        Instruction::CHO {
+            mode,
+            lfo,
+            flags,
+            addr,
+        } => {
             let opcode = 0b11001_u32 << 27;
             let mode_bits = encode_cho_mode(*mode) << 24;
             let lfo_bits = encode_lfo(*lfo) << 22;
@@ -191,8 +200,8 @@ fn encode_register(reg: &Register) -> Result<u32, CodegenError> {
         Register::ADDR_PTR => Ok(0b00100),
         Register::LR => Ok(0b00101),
         Register::REG(n) if *n < 32 => Ok(*n as u32 + 16), // REG0-31 are offset by 16
-        Register::ACC => Ok(0), // ACC is implicit in most operations
-        _ => Ok(0), // Default for special registers
+        Register::ACC => Ok(0),                            // ACC is implicit in most operations
+        _ => Ok(0),                                        // Default for special registers
     }
 }
 
