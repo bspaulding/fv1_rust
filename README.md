@@ -18,6 +18,7 @@ This is a Cargo workspace containing multiple crates:
 ✅ **Phase 1 - Milestone 1.2**: Assembler Core (Complete)
 ✅ **Phase 1 - Milestone 1.3**: Code Generation (Complete)
 ✅ **Phase 1 - Milestone 1.4**: CLI Tool Enhancement (Complete)
+✅ **Phase 2 - Milestone 2.1**: Macro Foundation (Complete)
 
 ## Features
 
