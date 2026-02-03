@@ -164,6 +164,36 @@ A comprehensive roadmap for building a complete Rust ecosystem for FV-1 DSP prog
 - `5387e59` - Implement enhanced CLI tool with multiple output formats
 - `5c3eb11` - Update documentation and mark milestone complete
 
+#### Phase 1: Milestone 1.5 - CLI Tool with Subcommands (Week 4-5)
+**Status**: ✅ COMPLETE  
+**Completed**: 2026-02-03
+
+**Deliverables**:
+- ✅ CLI restructured with subcommand architecture:
+  - `assemble` subcommand: Assembles .asm files to binary/hex/C array formats
+  - `check` subcommand: Validates assembly files without generating output
+  - `disassemble` subcommand: Stub implementation (marked as TODO)
+- ✅ Assemble subcommand features:
+  - Input/output file specification
+  - Multiple output formats (bin, hex, C array)
+  - Optimization flag (-O/--optimize)
+  - Verbose output mode (-v/--verbose)
+  - Custom C array naming (--name)
+- ✅ Check subcommand:
+  - Validates assembly syntax and structure
+  - Reports instruction and label counts
+  - Provides clear success/error messages
+- ✅ Improved CLI structure:
+  - Better command organization with subcommands
+  - Consistent help messages for all commands
+  - Proper argument parsing with clap
+- ✅ All existing tests passing (64 total)
+- ✅ Clippy and rustfmt compliance
+- ✅ CLI tested with all three subcommands
+
+**Commits**:
+- `2a458e7` - Implement Milestone 1.5: CLI tool with subcommands
+
 ### 🚧 In Progress
 
 *No active work items*
