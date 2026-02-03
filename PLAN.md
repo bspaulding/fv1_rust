@@ -48,20 +48,59 @@ A comprehensive roadmap for building a complete Rust ecosystem for FV-1 DSP prog
 - `335e486` - Add GitHub CI workflow for tests and linting
 - `d4dfd8b` - Add explicit permissions to CI workflow for security
 
+#### Phase 1: Milestone 1.2 - Assembler Core (Week 2-3)
+**Status**: ✅ COMPLETE  
+**Completed**: 2026-02-03
+
+**Deliverables**:
+- ✅ Lexer implementation (`lexer.rs`):
+  - Tokenizes FV-1 assembly using `logos` crate
+  - All FV-1 instructions (RDAX, RDA, WRAX, SOF, CLR, etc.)
+  - All registers (ADCL/ADCR/DACL/DACR, REG0-31, POT0-2)
+  - LFO oscillators (SIN0/1, RMP0/1)
+  - Numeric literals (float, hex, binary)
+  - Case-insensitive token matching
+  - Automatic comment stripping (`;` line comments)
+- ✅ Parser implementation (`parser.rs`):
+  - Recursive descent parser converting tokens to AST
+  - All instruction types with proper operands
+  - Label support (standalone and inline)
+  - Directive support (EQU, MEM, SPINASM)
+  - Expression evaluation for coefficients
+- ✅ AST data structures (`ast.rs`):
+  - `Program`: Complete program representation
+  - `Directive`: EQU, MEM, SpinAsm directives
+  - `Statement`: Instructions, labels, labeled instructions
+  - `Value`: Float, integer, identifier values
+  - Label-to-instruction-index resolution
+- ✅ Error handling (`error.rs`):
+  - `ParseError` with source span information
+  - `CodegenError` for code generation
+  - Beautiful error diagnostics using `miette`
+- ✅ Dependencies added: logos, thiserror, miette
+- ✅ 27 new unit tests (36 total), all passing
+- ✅ Code review completed, feedback addressed
+- ✅ CodeQL security scan passed with 0 alerts
+- ✅ Clippy and rustfmt compliance
+
+**Commits**:
+- `3bb2c6e` - Implement Milestone 1.2 core: lexer, parser, AST, and error types
+- `85fbef2` - Address code review feedback: fix return types and improve error handling
+
 ### 🚧 In Progress
 
 *No active work items*
 
 ### 📋 Next Up
 
-#### Phase 1: Milestone 1.2 - Assembler Core (Week 2-3)
+#### Phase 1: Milestone 1.3 - Code Generation (Week 3-4)
 **Status**: 📋 PLANNED
 
 **Goals**:
-- Implement lexer for SpinASM syntax
-- Build parser to create Abstract Syntax Tree (AST)
-- Add support for labels and symbolic addressing
-- Implement expression evaluation for coefficients
+- Implement binary code generation from AST
+- FV-1 instruction encoding
+- Memory allocation and management
+- Output .hex or binary file format
 
 -----
 
