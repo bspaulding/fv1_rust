@@ -114,19 +114,25 @@ fn main() -> Result<()> {
             let bytes = binary.to_bytes();
             fs::write(&output_path, bytes)
                 .into_diagnostic()
-                .wrap_err_with(|| format!("Failed to write output file: {}", output_path.display()))?;
+                .wrap_err_with(|| {
+                    format!("Failed to write output file: {}", output_path.display())
+                })?;
         }
         OutputFormat::Hex => {
             let hex = binary.to_hex();
             fs::write(&output_path, hex)
                 .into_diagnostic()
-                .wrap_err_with(|| format!("Failed to write output file: {}", output_path.display()))?;
+                .wrap_err_with(|| {
+                    format!("Failed to write output file: {}", output_path.display())
+                })?;
         }
         OutputFormat::C => {
             let c_array = binary.to_c_array(&cli.name);
             fs::write(&output_path, c_array)
                 .into_diagnostic()
-                .wrap_err_with(|| format!("Failed to write output file: {}", output_path.display()))?;
+                .wrap_err_with(|| {
+                    format!("Failed to write output file: {}", output_path.display())
+                })?;
         }
     }
 
