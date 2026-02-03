@@ -8,3 +8,5 @@ repository.workspace = true
 
 [dependencies]
 fv1-asm.workspace = true
+clap = { version = "4.5", features = ["derive"] }
+miette = { version = "7.0", features = ["fancy"] }
