@@ -1,3 +1,4 @@
+pub mod blocks;
 pub mod ops;
 pub mod typed;
 
@@ -89,6 +90,7 @@ impl Default for ProgramBuilder {
 
 /// Prelude module for convenient imports
 pub mod prelude {
+    pub use crate::blocks;
     pub use crate::ops::*;
     pub use crate::typed::TypedBuilder;
     pub use crate::{
