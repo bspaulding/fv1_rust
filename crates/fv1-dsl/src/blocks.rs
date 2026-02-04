@@ -65,10 +65,10 @@ pub fn lowpass(_input: Register, cutoff: Register, state: Register) -> Vec<Instr
     vec![
         // LP = state + cutoff * (input - state)
         // Since input is already in ACC, we compute: ACC - state
-        rdax(state, -1.0),  // ACC = input - state
-        mulx(cutoff),       // ACC = cutoff * (input - state)
-        rdax(state, 1.0),   // ACC = state + cutoff * (input - state)
-        wrax(state, 1.0),   // Store result in state, keep in ACC
+        rdax(state, -1.0), // ACC = input - state
+        mulx(cutoff),      // ACC = cutoff * (input - state)
+        rdax(state, 1.0),  // ACC = state + cutoff * (input - state)
+        wrax(state, 1.0),  // Store result in state, keep in ACC
     ]
 }
 
@@ -97,8 +97,8 @@ pub fn lowpass(_input: Register, cutoff: Register, state: Register) -> Vec<Instr
 pub fn soft_clip(threshold: f32) -> Vec<Instruction> {
     vec![
         // Simple soft clipping using ABSA and SOF
-        sof(threshold, 0.0), // Scale by threshold
-        absa(),              // Take absolute value for symmetrical clipping
+        sof(threshold, 0.0),       // Scale by threshold
+        absa(),                    // Take absolute value for symmetrical clipping
         sof(1.0 / threshold, 0.0), // Scale back
     ]
 }

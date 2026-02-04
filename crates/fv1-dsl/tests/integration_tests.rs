@@ -588,14 +588,14 @@ WRAX DACL, 0.0
         let dsl_program = builder.build();
 
         let _asm_binary = assemble_from_file(asm_source);
-        
+
         // The instruction count should be different (we have one extra SOF)
         assert_eq!(
             dsl_program.instructions().len(),
             10,
             "Block-based version has 10 instructions (1 extra SOF)"
         );
-        
+
         let dsl_binary = assemble_from_dsl(dsl_program);
 
         // Note: This won't be identical because we added an extra SOF instruction
@@ -663,25 +663,25 @@ WRAX DACL, 0.0
     fn test_lowpass_filter_block() {
         // Test the lowpass filter block
         let mut builder = ProgramBuilder::new();
-        
+
         // Read input
         builder.add_inst(rdax(Register::ADCL, 1.0));
-        
+
         // Apply lowpass filter
         for inst in blocks::lowpass(Register::ACC, Register::REG(16), Register::REG(1)) {
             builder.add_inst(inst);
         }
-        
+
         // Output
         builder.add_inst(wrax(Register::DACL, 0.0));
-        
+
         let program = builder.build();
-        
+
         // Verify it assembles correctly
         let assembler = Assembler::new();
         let result = assembler.assemble(&program);
         assert!(result.is_ok(), "Lowpass filter program should assemble");
-        
+
         // Verify instruction count: RDAX + 4 lowpass instructions + WRAX = 6
         assert_eq!(program.instructions().len(), 6);
     }
@@ -690,25 +690,25 @@ WRAX DACL, 0.0
     fn test_soft_clip_block() {
         // Test the soft_clip block
         let mut builder = ProgramBuilder::new();
-        
+
         // Read input
         builder.add_inst(rdax(Register::ADCL, 1.0));
-        
+
         // Apply soft clipping
         for inst in blocks::soft_clip(0.8) {
             builder.add_inst(inst);
         }
-        
+
         // Output
         builder.add_inst(wrax(Register::DACL, 0.0));
-        
+
         let program = builder.build();
-        
+
         // Verify it assembles correctly
         let assembler = Assembler::new();
         let result = assembler.assemble(&program);
         assert!(result.is_ok(), "Soft clip program should assemble");
-        
+
         // Verify instruction count: RDAX + 3 soft_clip instructions + WRAX = 5
         assert_eq!(program.instructions().len(), 5);
     }
@@ -717,31 +717,31 @@ WRAX DACL, 0.0
     fn test_complex_effect_with_multiple_blocks() {
         // Test combining multiple blocks: gain + lowpass + soft clip
         let mut builder = ProgramBuilder::new();
-        
+
         // Gain control
         builder.add_inst(blocks::gain(Register::ADCL, Register::REG(16))); // POT0
         builder.add_inst(mulx(Register::REG(16)));
-        
+
         // Lowpass filter
         for inst in blocks::lowpass(Register::ACC, Register::REG(17), Register::REG(1)) {
             builder.add_inst(inst);
         }
-        
+
         // Soft clipping
         for inst in blocks::soft_clip(0.9) {
             builder.add_inst(inst);
         }
-        
+
         // Output
         builder.add_inst(wrax(Register::DACL, 0.0));
-        
+
         let program = builder.build();
-        
+
         // Verify it assembles correctly
         let assembler = Assembler::new();
         let result = assembler.assemble(&program);
         assert!(result.is_ok(), "Complex multi-block effect should assemble");
-        
+
         // Verify instruction count: 2 (gain) + 4 (lowpass) + 3 (soft_clip) + 1 (output) = 10
         assert_eq!(program.instructions().len(), 10);
     }
