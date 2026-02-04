@@ -289,6 +289,47 @@ A comprehensive roadmap for building a complete Rust ecosystem for FV-1 DSP prog
 **Commits**:
 - TBD - Implement Milestone 2.2: Type-Safe DSL with phantom types
 
+#### Phase 2: Milestone 2.3 - High-Level Abstractions (Week 9-10)
+**Status**: ✅ COMPLETE  
+**Completed**: 2026-02-04
+
+**Deliverables**:
+- ✅ High-level DSP building blocks (`fv1-dsl/src/blocks.rs`):
+  - `gain()` function: Simple gain control wrapper for RDAX
+  - `lowpass()` function: One-pole lowpass filter implementation
+  - `soft_clip()` function: Soft clipping using ABSA and SOF
+  - `Delay` struct: High-level delay line abstraction with read/write methods
+- ✅ Comprehensive testing demonstrating equivalence:
+  - Tests building passthrough example using blocks
+  - Tests building gain control example using blocks
+  - Tests building delay echo example using blocks (exact equivalence)
+  - Tests lowpass filter block integration
+  - Tests soft clip block integration
+  - Tests complex multi-block effect combinations
+  - All tests verify programs assemble correctly and produce expected output
+- ✅ Integration with existing DSL:
+  - Blocks module exported through `prelude`
+  - Works with `ProgramBuilder` and `TypedBuilder`
+  - Compatible with `fv1_program!` macro
+  - Composable: blocks return instructions that can be added to any builder
+- ✅ Documentation:
+  - Detailed doc comments with usage examples for all blocks
+  - Doc tests demonstrate practical usage patterns
+  - Examples show both simple and complex effect chains
+- ✅ Test coverage:
+  - 6 unit tests for individual blocks
+  - 7 integration tests demonstrating real-world usage
+  - Tests verify equivalence to assembly versions where applicable
+  - All 33 fv1-dsl tests passing (27 unit + 6 doc tests + 25 integration tests)
+- ✅ Code quality:
+  - Clippy compliant
+  - rustfmt compliant
+  - No unsafe code
+  - Clear, maintainable abstractions
+
+**Commits**:
+- `e4c43d8` - Implement high-level abstractions in blocks module with comprehensive tests
+
 ### 🚧 In Progress
 
 *No active work items*

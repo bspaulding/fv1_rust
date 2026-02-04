@@ -462,3 +462,287 @@ WRAX DACL, 0.0
         );
     }
 }
+
+/// Tests demonstrating high-level abstractions from blocks module
+mod high_level_abstraction_tests {
+    use super::*;
+    use fv1_asm::{Assembler, Parser};
+
+    /// Helper function to parse an assembly file and assemble it
+    fn assemble_from_file(asm_source: &str) -> Vec<u8> {
+        let mut parser = Parser::new(asm_source);
+        let program = parser.parse().expect("Failed to parse assembly");
+        let assembler = Assembler::new();
+        let binary = assembler.assemble(&program).expect("Failed to assemble");
+        binary.to_bytes()
+    }
+
+    /// Helper function to assemble a DSL-built program
+    fn assemble_from_dsl(program: fv1_asm::Program) -> Vec<u8> {
+        let assembler = Assembler::new();
+        let binary = assembler
+            .assemble(&program)
+            .expect("Failed to assemble DSL program");
+        binary.to_bytes()
+    }
+
+    #[test]
+    fn test_passthrough_with_blocks() {
+        // Original assembly
+        let asm_source = r#"
+RDAX ADCL, 1.0
+WRAX DACL, 0.0
+"#;
+
+        // Using high-level blocks - passthrough is just read + write
+        // The blocks::gain function reads the input
+        let mut builder = ProgramBuilder::new();
+        builder.add_inst(blocks::gain(Register::ADCL, Register::REG(16)));
+        builder.add_inst(wrax(Register::DACL, 0.0));
+        let dsl_program = builder.build();
+
+        let asm_binary = assemble_from_file(asm_source);
+        let dsl_binary = assemble_from_dsl(dsl_program);
+
+        // Should produce identical binaries (gain without mulx is just rdax)
+        assert_eq!(
+            asm_binary, dsl_binary,
+            "Passthrough using blocks should produce identical binary"
+        );
+    }
+
+    #[test]
+    fn test_gain_control_with_blocks() {
+        // Original assembly (POT0 = REG16)
+        let asm_source = r#"
+RDAX ADCL, 1.0
+MULX POT0
+WRAX DACL, 0.0
+"#;
+
+        // Using high-level blocks - gain reads input, then we multiply
+        let mut builder = ProgramBuilder::new();
+        builder.add_inst(blocks::gain(Register::ADCL, Register::REG(16)));
+        builder.add_inst(mulx(Register::REG(16))); // POT0
+        builder.add_inst(wrax(Register::DACL, 0.0));
+        let dsl_program = builder.build();
+
+        let asm_binary = assemble_from_file(asm_source);
+        let dsl_binary = assemble_from_dsl(dsl_program);
+
+        assert_eq!(
+            asm_binary, dsl_binary,
+            "Gain control using blocks should produce identical binary"
+        );
+    }
+
+    #[test]
+    fn test_delay_echo_with_blocks() {
+        // Original assembly (POT1 = REG17, POT2 = REG18)
+        let asm_source = r#"
+RDAX ADCL, 1.0
+WRAX REG0, 0.0
+RDA 4000, 0.5
+MULX POT1
+RDAX REG0, 1.0
+WRA 0, 0.0
+MULX POT2
+RDAX REG0, 1.0
+WRAX DACL, 0.0
+"#;
+
+        // Using high-level blocks with Delay abstraction
+        let delay = blocks::Delay::new(0, 4000);
+
+        let mut builder = ProgramBuilder::new();
+        // Read input and save
+        builder.add_inst(rdax(Register::ADCL, 1.0));
+        builder.add_inst(wrax(Register::REG(0), 0.0));
+
+        // Read delayed signal using Delay block
+        for inst in delay.read(4000) {
+            builder.add_inst(inst);
+        }
+
+        // Note: We need to use specific coefficient for RDA
+        // The Delay::read uses coefficient 1.0, but original uses 0.5
+        // So we need to scale it
+        builder.add_inst(sof(0.5, 0.0)); // Scale to match original 0.5 coefficient
+
+        // Add feedback
+        builder.add_inst(mulx(Register::REG(17))); // POT1
+        builder.add_inst(rdax(Register::REG(0), 1.0));
+
+        // Write to delay line using Delay block
+        for inst in delay.write(0.0) {
+            builder.add_inst(inst);
+        }
+
+        // Mix wet/dry
+        builder.add_inst(mulx(Register::REG(18))); // POT2
+        builder.add_inst(rdax(Register::REG(0), 1.0));
+
+        // Output
+        builder.add_inst(wrax(Register::DACL, 0.0));
+
+        let dsl_program = builder.build();
+
+        let _asm_binary = assemble_from_file(asm_source);
+
+        // The instruction count should be different (we have one extra SOF)
+        assert_eq!(
+            dsl_program.instructions().len(),
+            10,
+            "Block-based version has 10 instructions (1 extra SOF)"
+        );
+
+        let dsl_binary = assemble_from_dsl(dsl_program);
+
+        // Note: This won't be identical because we added an extra SOF instruction
+        // But let's verify it assembles correctly
+        assert!(
+            !dsl_binary.is_empty(),
+            "Delay echo using blocks should assemble successfully"
+        );
+    }
+
+    #[test]
+    fn test_delay_echo_with_blocks_exact_equivalence() {
+        // Let's create a version that matches exactly by using RDA directly with coefficient
+        let asm_source = r#"
+RDAX ADCL, 1.0
+WRAX REG0, 0.0
+RDA 4000, 0.5
+MULX POT1
+RDAX REG0, 1.0
+WRA 0, 0.0
+MULX POT2
+RDAX REG0, 1.0
+WRAX DACL, 0.0
+"#;
+
+        // Using Delay block but with manual coefficient control
+        let delay = blocks::Delay::new(0, 4000);
+
+        let mut builder = ProgramBuilder::new();
+        // Read input and save
+        builder.add_inst(rdax(Register::ADCL, 1.0));
+        builder.add_inst(wrax(Register::REG(0), 0.0));
+
+        // Read delayed signal - use RDA directly with correct coefficient
+        builder.add_inst(rda(4000, 0.5));
+
+        // Add feedback
+        builder.add_inst(mulx(Register::REG(17))); // POT1
+        builder.add_inst(rdax(Register::REG(0), 1.0));
+
+        // Write to delay line using Delay block
+        for inst in delay.write(0.0) {
+            builder.add_inst(inst);
+        }
+
+        // Mix wet/dry
+        builder.add_inst(mulx(Register::REG(18))); // POT2
+        builder.add_inst(rdax(Register::REG(0), 1.0));
+
+        // Output
+        builder.add_inst(wrax(Register::DACL, 0.0));
+
+        let dsl_program = builder.build();
+
+        let asm_binary = assemble_from_file(asm_source);
+        let dsl_binary = assemble_from_dsl(dsl_program);
+
+        assert_eq!(
+            asm_binary, dsl_binary,
+            "Delay echo using blocks should produce identical binary when using exact coefficients"
+        );
+    }
+
+    #[test]
+    fn test_lowpass_filter_block() {
+        // Test the lowpass filter block
+        let mut builder = ProgramBuilder::new();
+
+        // Read input
+        builder.add_inst(rdax(Register::ADCL, 1.0));
+
+        // Apply lowpass filter
+        for inst in blocks::lowpass(Register::ACC, Register::REG(16), Register::REG(1)) {
+            builder.add_inst(inst);
+        }
+
+        // Output
+        builder.add_inst(wrax(Register::DACL, 0.0));
+
+        let program = builder.build();
+
+        // Verify it assembles correctly
+        let assembler = Assembler::new();
+        let result = assembler.assemble(&program);
+        assert!(result.is_ok(), "Lowpass filter program should assemble");
+
+        // Verify instruction count: RDAX + 4 lowpass instructions + WRAX = 6
+        assert_eq!(program.instructions().len(), 6);
+    }
+
+    #[test]
+    fn test_soft_clip_block() {
+        // Test the soft_clip block
+        let mut builder = ProgramBuilder::new();
+
+        // Read input
+        builder.add_inst(rdax(Register::ADCL, 1.0));
+
+        // Apply soft clipping
+        for inst in blocks::soft_clip(0.8) {
+            builder.add_inst(inst);
+        }
+
+        // Output
+        builder.add_inst(wrax(Register::DACL, 0.0));
+
+        let program = builder.build();
+
+        // Verify it assembles correctly
+        let assembler = Assembler::new();
+        let result = assembler.assemble(&program);
+        assert!(result.is_ok(), "Soft clip program should assemble");
+
+        // Verify instruction count: RDAX + 3 soft_clip instructions + WRAX = 5
+        assert_eq!(program.instructions().len(), 5);
+    }
+
+    #[test]
+    fn test_complex_effect_with_multiple_blocks() {
+        // Test combining multiple blocks: gain + lowpass + soft clip
+        let mut builder = ProgramBuilder::new();
+
+        // Gain control
+        builder.add_inst(blocks::gain(Register::ADCL, Register::REG(16))); // POT0
+        builder.add_inst(mulx(Register::REG(16)));
+
+        // Lowpass filter
+        for inst in blocks::lowpass(Register::ACC, Register::REG(17), Register::REG(1)) {
+            builder.add_inst(inst);
+        }
+
+        // Soft clipping
+        for inst in blocks::soft_clip(0.9) {
+            builder.add_inst(inst);
+        }
+
+        // Output
+        builder.add_inst(wrax(Register::DACL, 0.0));
+
+        let program = builder.build();
+
+        // Verify it assembles correctly
+        let assembler = Assembler::new();
+        let result = assembler.assemble(&program);
+        assert!(result.is_ok(), "Complex multi-block effect should assemble");
+
+        // Verify instruction count: 2 (gain) + 4 (lowpass) + 3 (soft_clip) + 1 (output) = 10
+        assert_eq!(program.instructions().len(), 10);
+    }
+}
