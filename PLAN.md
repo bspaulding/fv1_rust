@@ -330,6 +330,44 @@ A comprehensive roadmap for building a complete Rust ecosystem for FV-1 DSP prog
 **Commits**:
 - `e4c43d8` - Implement high-level abstractions in blocks module with comprehensive tests
 
+#### Phase 2: Milestone 2.4 - DSL Examples (Week 10)
+**Status**: ✅ COMPLETE  
+**Completed**: 2026-02-04
+
+**Deliverables**:
+- ✅ DSL examples module in `fv1-examples` crate (`fv1-examples/src/lib.rs`):
+  - `passthrough_macro()`: Pass-through using `fv1_program!` macro
+  - `passthrough_builder()`: Pass-through using `ProgramBuilder`
+  - `passthrough_typed()`: Pass-through using type-safe `TypedBuilder`
+  - `gain_control()`: Gain control with POT0 using macro
+  - `gain_control_typed()`: Gain control using type-safe builder
+  - `delay_echo()`: Delay/echo effect with feedback and mix controls
+  - `advanced_effect()`: Complex effect combining multiple blocks (gain, lowpass, soft clip)
+  - `multi_tap_delay()`: Multi-tap delay using `Delay` abstraction
+- ✅ Comprehensive documentation:
+  - Doc comments for all example functions
+  - Inline examples showing how to use each function
+  - Doc tests demonstrating program assembly (5 doc tests)
+  - Examples cover all three DSL APIs: macro, untyped builder, typed builder
+- ✅ Test coverage:
+  - 11 unit tests covering all DSL examples
+  - Tests verify instruction counts and assemblability
+  - Special test ensuring all examples can be assembled successfully
+  - All tests passing (11/11)
+- ✅ Integration:
+  - Added `fv1-dsl` dependency to `fv1-examples` crate
+  - Examples demonstrate progression from simple to complex
+  - Shows three different programming styles (macro, builder, typed)
+  - Demonstrates blocks module usage in real effects
+- ✅ Code quality:
+  - Clippy compliant
+  - rustfmt compliant
+  - Clear, well-documented examples
+  - Demonstrates best practices for DSL usage
+
+**Commits**:
+- `65edbe8` - Add DSL examples to fv1-examples crate
+
 ### 🚧 In Progress
 
 *No active work items*
@@ -1991,6 +2029,131 @@ pub mod blocks {
     }
 }
 ```
+
+-----
+
+### Milestone 2.4: DSL Examples (Week 10)
+**Status**: ✅ COMPLETE  
+**Completed**: 2026-02-04
+
+**Goal**: Provide comprehensive DSL usage examples in the `fv1-examples` crate.
+
+**File: `fv1-examples/src/lib.rs`**
+
+```rust
+/// DSL examples demonstrating high-level programming with the FV-1 DSL
+pub mod dsl_examples {
+    use fv1_dsl::prelude::*;
+
+    /// Simple pass-through using the fv1_program! macro
+    pub fn passthrough_macro() -> fv1_asm::Program {
+        fv1_program! {
+            rdax(Register::ADCL, 1.0);
+            wrax(Register::DACL, 0.0);
+        }
+    }
+
+    /// Simple pass-through using the untyped ProgramBuilder
+    pub fn passthrough_builder() -> fv1_asm::Program {
+        ProgramBuilder::new()
+            .inst(rdax(Register::ADCL, 1.0))
+            .inst(wrax(Register::DACL, 0.0))
+            .build()
+    }
+
+    /// Simple pass-through using the type-safe TypedBuilder
+    pub fn passthrough_typed() -> fv1_asm::Program {
+        TypedBuilder::new()
+            .rdax(Register::ADCL, 1.0)
+            .wrax(Register::DACL, 0.0)
+            .build()
+    }
+
+    /// Gain control example using POT0
+    pub fn gain_control() -> fv1_asm::Program {
+        fv1_program! {
+            rdax(Register::ADCL, 1.0);
+            mulx(Register::REG(16)); // POT0
+            wrax(Register::DACL, 0.0);
+        }
+    }
+
+    /// Delay echo effect with feedback and mix controls
+    pub fn delay_echo() -> fv1_asm::Program {
+        TypedBuilder::new()
+            .rdax(Register::ADCL, 1.0)
+            .wrax(Register::REG(0), 0.0)
+            .rda(4000, 0.5)
+            .mulx(Register::REG(17)) // POT1 - feedback
+            .rdax(Register::REG(0), 1.0)
+            .wra(0, 0.0)
+            .mulx(Register::REG(18)) // POT2 - wet amount
+            .rdax(Register::REG(0), 1.0)
+            .wrax(Register::DACL, 0.0)
+            .build()
+    }
+
+    /// Advanced effect combining multiple blocks
+    pub fn advanced_effect() -> fv1_asm::Program {
+        let mut builder = ProgramBuilder::new();
+
+        // Input gain control with POT0
+        builder.add_inst(blocks::gain(Register::ADCL, Register::REG(16)));
+        builder.add_inst(mulx(Register::REG(16)));
+
+        // One-pole lowpass filter with POT1
+        for inst in blocks::lowpass(Register::ACC, Register::REG(17), Register::REG(1)) {
+            builder.add_inst(inst);
+        }
+
+        // Soft clipping
+        for inst in blocks::soft_clip(0.9) {
+            builder.add_inst(inst);
+        }
+
+        builder.add_inst(wrax(Register::DACL, 0.0));
+        builder.build()
+    }
+
+    /// Multi-tap delay using Delay abstraction
+    pub fn multi_tap_delay() -> fv1_asm::Program {
+        let delay = blocks::Delay::new(0, 8000);
+        let mut builder = ProgramBuilder::new();
+
+        // Read and save input
+        builder.add_inst(rdax(Register::ADCL, 1.0));
+        builder.add_inst(wrax(Register::REG(0), 0.0));
+
+        // Multi-tap delay processing
+        builder.add_inst(clr());
+        builder.add_inst(rda(2000, 0.4)); // First tap
+        builder.add_inst(rda(4000, 0.3)); // Second tap
+        builder.add_inst(mulx(Register::REG(17))); // POT1 - wet
+        builder.add_inst(rdax(Register::REG(0), 1.0)); // Add dry
+
+        // Write to delay with feedback
+        builder.add_inst(wrax(Register::REG(1), 1.0));
+        builder.add_inst(rdax(Register::REG(0), 1.0));
+        builder.add_inst(mulx(Register::REG(16))); // POT0 - feedback
+        builder.add_inst(rdax(Register::REG(1), 1.0));
+        
+        for inst in delay.write(0.0) {
+            builder.add_inst(inst);
+        }
+
+        builder.add_inst(rdax(Register::REG(1), 1.0));
+        builder.add_inst(wrax(Register::DACL, 0.0));
+        builder.build()
+    }
+}
+```
+
+**Key Features**:
+- Demonstrates all three DSL programming styles (macro, untyped builder, typed builder)
+- Shows progression from simple to complex effects
+- Uses high-level blocks for advanced effects
+- All examples are tested and documented
+- Provides practical starting points for users
 
 -----
 

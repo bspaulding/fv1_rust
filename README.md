@@ -21,6 +21,7 @@ This is a Cargo workspace containing multiple crates:
 ✅ **Phase 2 - Milestone 2.1**: Macro Foundation (Complete)
 ✅ **Phase 2 - Milestone 2.2**: Type-Safe DSL (Complete)
 ✅ **Phase 2 - Milestone 2.3**: High-Level Abstractions (Complete)
+✅ **Phase 2 - Milestone 2.4**: DSL Examples (Complete)
 
 ## Features
 
