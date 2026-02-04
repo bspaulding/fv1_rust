@@ -1,5 +1,164 @@
 use fv1_dsl::prelude::*;
 
+/// Tests for the type-safe TypedBuilder
+mod typed_builder_tests {
+    use super::*;
+
+    #[test]
+    fn test_typed_builder_basic_program() {
+        let program = TypedBuilder::new()
+            .rdax(Register::ADCL, 1.0)
+            .wrax(Register::DACL, 0.0)
+            .build();
+
+        assert_eq!(program.instructions().len(), 2);
+    }
+
+    #[test]
+    fn test_typed_builder_gain_control() {
+        // Same gain control as before, but with type safety
+        let program = TypedBuilder::new()
+            .rdax(Register::ADCL, 1.0) // Transitions to Audio state
+            .mulx(Register::REG(16)) // POT0, stays in Audio state
+            .wrax(Register::DACL, 0.0) // Stays in Audio state
+            .build();
+
+        assert_eq!(program.instructions().len(), 3);
+
+        // Verify the instructions are correct
+        let instructions = program.instructions();
+        match instructions[0] {
+            fv1_asm::Instruction::RDAX { reg, coeff } => {
+                assert_eq!(*reg, Register::ADCL);
+                assert_eq!(*coeff, 1.0);
+            }
+            _ => panic!("Expected RDAX instruction"),
+        }
+    }
+
+    #[test]
+    fn test_typed_builder_clr_start() {
+        // Start with CLR which transitions to Audio state
+        let program = TypedBuilder::new()
+            .clr() // Transitions to Audio state
+            .rdax(Register::ADCL, 1.0) // Stays in Audio state
+            .wrax(Register::DACL, 0.0)
+            .build();
+
+        assert_eq!(program.instructions().len(), 3);
+    }
+
+    #[test]
+    fn test_typed_builder_delay_echo() {
+        // Delay echo using TypedBuilder
+        let program = TypedBuilder::new()
+            .rdax(Register::ADCL, 1.0)
+            .wrax(Register::REG(0), 0.0)
+            .rda(4000, 0.5)
+            .mulx(Register::REG(17)) // POT1
+            .rdax(Register::REG(0), 1.0)
+            .wra(0, 0.0)
+            .mulx(Register::REG(18)) // POT2
+            .rdax(Register::REG(0), 1.0)
+            .wrax(Register::DACL, 0.0)
+            .build();
+
+        assert_eq!(program.instructions().len(), 9);
+    }
+
+    #[test]
+    fn test_typed_builder_can_be_assembled() {
+        use fv1_asm::Assembler;
+
+        let program = TypedBuilder::new()
+            .rdax(Register::ADCL, 1.0)
+            .sof(0.5, 0.0)
+            .wrax(Register::DACL, 0.0)
+            .build();
+
+        // Verify we can assemble it
+        let assembler = Assembler::new();
+        let result = assembler.assemble(&program);
+
+        assert!(result.is_ok());
+        let binary = result.unwrap();
+
+        // Binary should contain our 3 instructions
+        let bytes = binary.to_bytes();
+        assert!(
+            bytes.len() >= 12,
+            "Binary should contain at least 12 bytes for 3 instructions"
+        );
+    }
+
+    #[test]
+    fn test_typed_builder_complex_effects_chain() {
+        // Complex audio processing chain demonstrating type safety
+        let program = TypedBuilder::new()
+            .clr() // Start clean
+            .rdax(Register::ADCL, 1.0) // Read input
+            .sof(0.9, 0.0) // Scale down slightly
+            .wrax(Register::REG(0), 0.5) // Store and keep half in ACC
+            .rda(8000, 0.6) // Read delayed signal
+            .mulx(Register::REG(16)) // Modulate with POT0
+            .rdax(Register::REG(0), 1.0) // Add dry signal
+            .sof(0.8, 0.0) // Scale output
+            .wrax(Register::DACL, 0.0) // Output
+            .build();
+
+        assert_eq!(program.instructions().len(), 9);
+
+        // Verify it can be assembled
+        use fv1_asm::Assembler;
+        let assembler = Assembler::new();
+        let result = assembler.assemble(&program);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_typed_builder_bitwise_operations() {
+        // Test bitwise operations in the type-safe builder
+        let program = TypedBuilder::new()
+            .rdax(Register::ADCL, 1.0)
+            .and(0xFFFF0000)
+            .or(0x0000FFFF)
+            .xor(0x0000FF00)
+            .wrax(Register::DACL, 0.0)
+            .build();
+
+        assert_eq!(program.instructions().len(), 5);
+    }
+
+    #[test]
+    fn test_typed_builder_math_operations() {
+        // Test mathematical operations
+        let program = TypedBuilder::new()
+            .rdax(Register::ADCL, 1.0)
+            .absa() // Absolute value
+            .exp(1.0, 0.0) // Exponential
+            .log(1.0, 0.0) // Logarithm
+            .wrax(Register::DACL, 0.0)
+            .build();
+
+        assert_eq!(program.instructions().len(), 5);
+    }
+
+    #[test]
+    fn test_typed_builder_nop_insertion() {
+        // Test NOP instructions can be inserted anywhere
+        let program = TypedBuilder::new()
+            .nop()
+            .rdax(Register::ADCL, 1.0)
+            .nop()
+            .nop()
+            .wrax(Register::DACL, 0.0)
+            .nop()
+            .build();
+
+        assert_eq!(program.instructions().len(), 6);
+    }
+}
+
 #[test]
 fn test_macro_basic_program() {
     let program = fv1_program! {

@@ -247,6 +247,48 @@ A comprehensive roadmap for building a complete Rust ecosystem for FV-1 DSP prog
 - `fdd13b7` - Add property tests for disassembler roundtrip
 - `427d50d` - Fix clippy warnings
 
+#### Phase 2: Milestone 2.2 - Type-Safe DSL (Week 8-9)
+**Status**: ✅ COMPLETE  
+**Completed**: 2026-02-03
+
+**Deliverables**:
+- ✅ Type-safe builder with phantom types (`fv1-dsl/src/typed.rs`):
+  - `TypedBuilder<State>` generic builder with state tracking
+  - Phantom type markers: `Audio`, `Control`, `Lfo`
+  - State transitions enforced at compile-time
+- ✅ Comprehensive instruction set coverage:
+  - Audio operations: rdax, wrax, mulx, sof, rda, wra, wrap, rmpa, ldax
+  - Mathematical operations: absa, exp, log
+  - Bitwise operations: and, or, xor
+  - Control operations: clr, nop
+  - All operations maintain or transition accumulator state appropriately
+- ✅ Type system guarantees:
+  - `rdax` and `clr` transition to `Audio` state
+  - Audio state operations maintain state consistency
+  - `nop` preserves current state
+  - Cannot call audio-only operations from non-audio states
+- ✅ Integration with existing DSL:
+  - Works alongside `ProgramBuilder` (untyped builder)
+  - Compatible with `fv1_program!` macro
+  - Exports through `prelude` module
+- ✅ Comprehensive testing:
+  - 10 unit tests in `typed.rs`
+  - 9 integration tests demonstrating type-safe usage
+  - Tests for basic programs, gain control, delay echo, complex chains
+  - All existing tests still passing (39 total tests)
+- ✅ Documentation:
+  - Detailed doc comments on `TypedBuilder` and all methods
+  - Usage examples in doc tests
+  - Integration test examples demonstrate real-world patterns
+- ✅ Code quality:
+  - Clippy compliant
+  - rustfmt compliant
+  - No unsafe code
+  - Zero-cost abstraction (phantom types are compile-time only)
+
+**Commits**:
+- TBD - Implement Milestone 2.2: Type-Safe DSL with phantom types
+
 ### 🚧 In Progress
 
 *No active work items*
@@ -1744,6 +1786,8 @@ fn main() {
 -----
 
 ### Milestone 2.2: Type-Safe DSL (Week 8-9)
+**Status**: ✅ COMPLETE  
+**Completed**: 2026-02-03
 
 **Goal**: Add type safety and compile-time validation.
 

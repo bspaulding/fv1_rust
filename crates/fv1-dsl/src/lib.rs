@@ -1,9 +1,11 @@
 pub mod ops;
+pub mod typed;
 
 pub use fv1_asm::{
     ChoFlags, ChoMode, Control, Instruction, Lfo, Program, Register, SkipCondition, Statement,
 };
 pub use fv1_dsl_macro::fv1_program;
+pub use typed::TypedBuilder;
 
 use std::collections::HashMap;
 
@@ -88,6 +90,7 @@ impl Default for ProgramBuilder {
 /// Prelude module for convenient imports
 pub mod prelude {
     pub use crate::ops::*;
+    pub use crate::typed::TypedBuilder;
     pub use crate::{
         ChoFlags, ChoMode, Control, Instruction, Lfo, ProgramBuilder, Register, SkipCondition,
     };
