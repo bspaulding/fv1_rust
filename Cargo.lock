@@ -239,6 +239,7 @@ name = "fv1-examples"
 version = "0.1.0"
 dependencies = [
  "fv1-asm",
+ "fv1-dsl",
 ]
 
 [[package]]

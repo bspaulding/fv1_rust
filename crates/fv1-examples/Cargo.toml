@@ -8,3 +8,4 @@ repository.workspace = true
 
 [dependencies]
 fv1-asm.workspace = true
+fv1-dsl.workspace = true
